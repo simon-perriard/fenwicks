@@ -117,7 +117,7 @@ def weight_decay_loss(wd: float = 0.0005) -> tf.Tensor:
 
 def get_tpu_estimator(steps_per_epoch: int, model_func, work_dir: str, ws_dir: str = None, ws_vars: List[str] = None,
                       trn_bs: int = 128, val_bs: int = 1, pred_bs: int = 1, use_tpu: bool = True,
-                      use_time_in_work_dir: bool = True) -> tf.contrib.tpu.TPUEstimator:
+                      use_time_in_work_dir: bool = True) ->  tf.compat.v1.estimator.tpu.TPUEstimator:
     """
     Create a TPUEstimator object ready for training and evaluation.
 
