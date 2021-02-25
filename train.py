@@ -156,7 +156,7 @@ def get_tpu_estimator(steps_per_epoch: int, model_func, work_dir: str, ws_dir: s
                                        config=trn_cfg, warm_start_from=ws)
 
 
-def get_clf_model_func(model_arch: Callable, opt_func: Callable, reduction: str = tf.losses.Reduction.MEAN,
+def get_clf_model_func(model_arch: Callable, opt_func: Callable, reduction: str = tf.compat.v1.losses.Reduction.MEAN,
                        use_tpu: bool = True, init_ckpt: str = None) -> Callable:
     """
     Build a model function for a classification task to be used in a TPUEstimator, based on a given model architecture
