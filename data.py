@@ -103,7 +103,7 @@ def files_tfrecord(output_fn: str, paths: List[str], y: List[int] = None, overwr
                     example = numpy_tfexample(img) if y is None else numpy_tfexample(img, y[i])
                 record_writer.write(example.SerializeToString())
     else:
-        tf.logging.info('Output file already exists. Skipping.')
+        tf.compat.v1.logging.info('Output file already exists. Skipping.')
 
 
 def data_dir_tfrecord(data_dir: str, output_fn: str, shuffle: bool = False, overwrite: bool = False,
