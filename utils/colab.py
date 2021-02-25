@@ -4,7 +4,6 @@ from google import colab
 import tensorflow as tf
 import os
 import json
-import tensorflow_gcs_config as tgc
 
 TPU_ADDRESS = f'grpc://{os.environ["COLAB_TPU_ADDR"]}' if "COLAB_TPU_ADDR" in os.environ else None
 
