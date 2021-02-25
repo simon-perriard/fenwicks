@@ -35,7 +35,7 @@ def exp_decay_lr(init_lr: float, decay_steps: int, base_lr: float = 0, decay_rat
         """
         if step is None:
             step = tf.train.get_or_create_global_step()
-        return base_lr + tf.train.exponential_decay(init_lr, step, decay_steps, decay_rate)
+        return base_lr + tf.compat.v1.train.exponential_decay(init_lr, step, decay_steps, decay_rate)
 
     return lr_func
 
