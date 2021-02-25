@@ -49,7 +49,7 @@ def warmup_lr_sched(step: tf.Tensor, warmup_steps: int, init_lr: float, lr) -> t
 
 
 def linear_decay() -> Callable:
-    return functools.partial(tf.compat.v1.train.polynomial_decay, end_learning_rate=0.0, power=1.0, cycle=False)
+    return functools.partial(tf.compat.v1.train.polynomial_decay(end_learning_rate=0.0, power=1.0, cycle=False))
 
 
 def one_cycle_lr(init_lr: float, total_steps: int, warmup_steps: int, decay_sched: Callable) -> Callable:
