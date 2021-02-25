@@ -4,6 +4,7 @@ from google import colab
 import tensorflow as tf
 import os
 import json
+import tensorflow_gcs_config as tgc
 
 TPU_ADDRESS = f'grpc://{os.environ["COLAB_TPU_ADDR"]}' if "COLAB_TPU_ADDR" in os.environ else None
 
@@ -16,12 +17,13 @@ def setup_gcs(tpu_address: str = None):
     """
     colab.auth.authenticate_user()
 
-    tpu_address = tpu_address or TPU_ADDRESS
 
+# Not needed anymore, happens with colab.auth.authenticate_user()
+    '''tpu_address = tpu_address or TPU_ADDRESS
     with tf.compat.v1.Session(tpu_address) as sess:
         with open('/content/adc.json', 'r') as f:
             auth_info = json.load(f)
-        tf.contrib.cloud.configure_gcs(sess, credentials=auth_info)
+        tf.cloud.configure_gcs(sess, credentials=auth_info)'''
 
 
 def upload_files():
