@@ -1,6 +1,6 @@
 from ..imports import *
 
-import plotly.plotly
+import chart_studio.plotly as plotly
 import plotly.graph_objs as go
 import cufflinks as cf
 import operator
