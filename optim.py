@@ -8,7 +8,7 @@ def get_variable_name(param_name: str) -> str:
     return param_name
 
 
-class SGD(tf.train.MomentumOptimizer):
+class SGD(tf.compat.v1.train.MomentumOptimizer):
     def __init__(self, lr: tf.Tensor, mom: float, wd: float):
         super().__init__(lr, momentum=mom, use_nesterov=True)
         self.wd = wd
@@ -26,7 +26,7 @@ class SGD(tf.train.MomentumOptimizer):
         return grads_and_vars
 
 
-class Adam(tf.train.AdamOptimizer):
+class Adam(tf.compat.v1.train.AdamOptimizer):
     def __init__(self, lr: Union[float, tf.Tensor] = 0.001, wd: float = None, beta1: float = 0.9, beta2: float = 0.999,
                  epsilon: float = 1e-8, exclude_from_wd: List[str] = None, clip_norm: float = None):
         super().__init__(learning_rate=lr, beta1=beta1, beta2=beta2, epsilon=epsilon)
