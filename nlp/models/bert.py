@@ -255,7 +255,7 @@ def download_bert_vocab(bert_model: str = 'uncased_L-12_H-768_A-12') -> str:
         import tensorflow_hub as hub
         bert_module = hub.Module(bert_model_hub)
         tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
-        with tf.Session() as sess:
+        with tf.compat.v1.Session() as sess:
             vocab_file = sess.run(tokenization_info["vocab_file"])
     return vocab_file
 

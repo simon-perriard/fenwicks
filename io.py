@@ -121,7 +121,7 @@ def download(url: str, fn: str, overwrite: bool = False):
     if overwrite or not gfile.exists(fn):
         urllib.request.urlretrieve(url, fn)
     else:
-        tf.logging.info(f'Destination file exists. Skipping.')
+        tf.compat.v1.logging.info(f'Destination file exists. Skipping.')
 
 
 def unzip(fn, dest_dir: str = '.', overwrite: bool = False):
@@ -153,12 +153,12 @@ def unzip(fn, dest_dir: str = '.', overwrite: bool = False):
         cur_dir: str = os.getcwd()
         os.chdir(dest_dir)
         for fn in files:
-            tf.logging.info(f'Decompressing: {fn}')
+            tf.compat.v1.logging.info(f'Decompressing: {fn}')
             for _ in tqdm_notebook(libarchive.public.file_pour(fn)):
                 pass
         os.chdir(cur_dir)
     else:
-        tf.logging.info(f'Destination directory exists. Skipping.')
+        tf.compat.v1.logging.info(f'Destination directory exists. Skipping.')
 
 
 def sub_dirs(data_dir: str, exclude_dirs: List[str] = None) -> List[str]:
@@ -225,4 +225,4 @@ def upload_to_gcs(local_path: str, gcs_path: str):
     if not gfile.exists(gcs_path):
         gfile.copy(local_path, gcs_path)
     else:
-        tf.logging.info('Output file already exists. Skipping.')
+        tf.compat.v1.logging.info('Output file already exists. Skipping.')

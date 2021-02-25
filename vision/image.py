@@ -16,7 +16,7 @@ def compute_mean_std(fn_data: str, n_data: int, batch_size: int = 1) -> Tuple[fl
 
     x_count, x_sum, x_sum_sq = 0.0, np.zeros(3), np.zeros(3)
 
-    with tf.Session() as sess:
+    with tf.compat.v1.Session() as sess:
         for _ in range(n_data // batch_size):
             x, _ = sess.run(data_op)
             x = x.astype(np.float64)
@@ -54,7 +54,7 @@ def check_rgb(data_dir: str, file_ext: str = 'jpg', fix: bool = True):
             img = Image.open(fp)
             if img.mode != 'RGB':
                 fix_msg = 'Fixing it now.' if fix else ''
-                tf.logging.error(f'{fp} is not an RGB image but of mode: {img.mode}. {fix_msg}')
+                tf.compat.v1.logging.error(f'{fp} is not an RGB image but of mode: {img.mode}. {fix_msg}')
                 if fix:
                     img.convert("RGB").save(fp)
 

@@ -34,7 +34,7 @@ def exp_decay_lr(init_lr: float, decay_steps: int, base_lr: float = 0, decay_rat
         :return: Learning rate tensor.
         """
         if step is None:
-            step = tf.train.get_or_create_global_step()
+            step = tf.compat.v1.train.get_or_create_global_step()
         return base_lr + tf.compat.v1.train.exponential_decay(init_lr, step, decay_steps, decay_rate)
 
     return lr_func
@@ -72,7 +72,7 @@ def one_cycle_lr(init_lr: float, total_steps: int, warmup_steps: int, decay_sche
         """
 
         if step is None:
-            step = tf.train.get_or_create_global_step()
+            step = tf.compat.v1.train.get_or_create_global_step()
 
         lr = tf.constant(value=init_lr, shape=[], dtype=tf.float32)
         lr = decay_sched(lr, step - warmup_steps, total_steps - warmup_steps)
@@ -109,7 +109,7 @@ def sgd_optimizer(lr_func: Callable, mom: float = 0.9, wd: float = 0.0) -> Calla
 
 def weight_decay_loss(wd: float = 0.0005) -> tf.Tensor:
     l2_loss = []
-    for v in tf.trainable_variables():
+    for v in tf.compat.v1.trainable_variables():
         if 'BatchNorm' not in v.name and 'weights' in v.name:
             l2_loss.append(tf.nn.l2_loss(v))
     return wd * tf.add_n(l2_loss)
@@ -117,7 +117,7 @@ def weight_decay_loss(wd: float = 0.0005) -> tf.Tensor:
 
 def get_tpu_estimator(steps_per_epoch: int, model_func, work_dir: str, ws_dir: str = None, ws_vars: List[str] = None,
                       trn_bs: int = 128, val_bs: int = 1, pred_bs: int = 1, use_tpu: bool = True,
-                      use_time_in_work_dir: bool = True) ->  tf.compat.v1.estimator.tpu.TPUEstimator:
+                      use_time_in_work_dir: bool = True) -> tf.compat.v1.estimator.tpu.TPUEstimator:
     """
     Create a TPUEstimator object ready for training and evaluation.
 
@@ -135,23 +135,23 @@ def get_tpu_estimator(steps_per_epoch: int, model_func, work_dir: str, ws_dir: s
     """
 
     use_tpu = use_tpu and (TPU_ADDRESS is not None)
-    cluster = tf.contrib.cluster_resolver.TPUClusterResolver(TPU_ADDRESS) if use_tpu else None
+    cluster = tf.distribute.cluster_resolver.TPUClusterResolver(TPU_ADDRESS) if use_tpu else None
 
-    tpu_cfg = tf.contrib.tpu.TPUConfig(
+    tpu_cfg = tf.compat.v1.estimator.tpu.TPUConfig(
         iterations_per_loop=steps_per_epoch,
-        per_host_input_for_training=tf.contrib.tpu.InputPipelineConfig.PER_HOST_V2)
+        per_host_input_for_training=tf.compat.v1.estimator.tpu.InputPipelineConfig.PER_HOST_V2)
 
     if use_time_in_work_dir:
         now = datetime.datetime.now()
         time_str = f'{now.year}-{now.month:02d}-{now.day:02d}-{now.hour:02d}:{now.minute:02d}:{now.second:02d}'
         work_dir = os.path.join(work_dir, time_str)
 
-    trn_cfg = tf.contrib.tpu.RunConfig(cluster=cluster, model_dir=work_dir, tpu_config=tpu_cfg)
+    trn_cfg = tf.compat.v1.estimator.tpu.RunConfig(cluster=cluster, model_dir=work_dir, tpu_config=tpu_cfg)
 
     ws = None if ws_dir is None else tf.estimator.WarmStartSettings(ckpt_to_initialize_from=ws_dir,
                                                                     vars_to_warm_start=ws_vars)
 
-    return tf.contrib.tpu.TPUEstimator(use_tpu=use_tpu, model_fn=model_func, model_dir=work_dir,
+    return tf.compat.v1.estimator.tpu.TPUEstimator(use_tpu=use_tpu, model_fn=model_func, model_dir=work_dir,
                                        train_batch_size=trn_bs, eval_batch_size=val_bs, predict_batch_size=pred_bs,
                                        config=trn_cfg, warm_start_from=ws)
 
@@ -186,37 +186,37 @@ def get_clf_model_func(model_arch: Callable, opt_func: Callable, reduction: str 
         loss = None
 
         if mode != tf.estimator.ModeKeys.PREDICT:
-            loss = tf.losses.sparse_softmax_cross_entropy(labels, logits, reduction=reduction)
+            loss = tf.compat.v1.losses.sparse_softmax_cross_entropy(labels, logits, reduction=reduction)
 
         if mode == tf.estimator.ModeKeys.TRAIN:
-            step = tf.train.get_or_create_global_step()
+            step = tf.compat.v1.train.get_or_create_global_step()
 
             opt = opt_func()
             if use_tpu:
-                opt = tf.contrib.tpu.CrossShardOptimizer(opt, reduction=reduction)
+                opt = tf.compat.v1.tpu.CrossShardOptimizer(opt, reduction=reduction)
 
             var = model.trainable_variables  # this excludes frozen variables
             grads_and_vars = opt.compute_gradients(loss, var_list=var)
             with tf.control_dependencies(model.get_updates_for(features)):
                 train_op = opt.apply_gradients(grads_and_vars, global_step=step)
 
-        metric_func = lambda y_pred, labels: {'accuracy': tf.metrics.accuracy(y_pred, labels)}
+        metric_func = lambda y_pred, labels: {'accuracy': tf.compat.v1.metrics.accuracy(y_pred, labels)}
         tpu_metrics = (metric_func, [y_pred, labels])
 
         scaffold_func = None
         if init_ckpt:
-            tvars = tf.trainable_variables()
+            tvars = tf.compat.v1.trainable_variables()
             assignment_map = ckpt_assignment_map(tvars, init_ckpt)
             if use_tpu:
                 def tpu_scaffold():
-                    tf.train.init_from_checkpoint(init_ckpt, assignment_map)
-                    return tf.train.Scaffold()
+                    tf.compat.v1.train.init_from_checkpoint(init_ckpt, assignment_map)
+                    return tf.compat.v1.train.Scaffold()
 
                 scaffold_func = tpu_scaffold
             else:
-                tf.train.init_from_checkpoint(init_ckpt, assignment_map)
+                tf.compat.v1.train.init_from_checkpoint(init_ckpt, assignment_map)
 
-        return tf.contrib.tpu.TPUEstimatorSpec(mode=mode, loss=loss, predictions={"y_pred": y_pred},
+        return tf.compat.v1.estimator.tpu.TPUEstimatorSpec(mode=mode, loss=loss, predictions={"y_pred": y_pred},
                                                train_op=train_op, scaffold_fn=scaffold_func, eval_metrics=tpu_metrics)
 
     return model_func

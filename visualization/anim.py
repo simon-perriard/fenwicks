@@ -45,7 +45,7 @@ def show_dataset(ds: tf.data.Dataset, n_batch: int = 1, n_img: int = 10,
     X = []
     data_op = ds.make_one_shot_iterator().get_next()
 
-    with tf.Session() as sess:
+    with tf.compat.v1.Session() as sess:
         for _ in range(n_batch):
             x, _ = sess.run(data_op)
             if len(x) >= n_img:
@@ -77,13 +77,13 @@ def show_transform(tfm: Union[Callable, List[Callable]], img_fn: str, n_frames: 
                    anim_fn: str = '/tmp/anim.gif') -> Union[Image, FuncAnimation]:
     images = []
 
-    img = tf.read_file(img_fn)
+    img = tf.compat.v1.read_file(img_fn)
     img = tf.io.decode_image(img, channels=3, dtype=tf.float32)
     img.set_shape([None, None, 3])
 
     op = core.sequential_transforms(img, tfm) if isinstance(tfm, list) else tfm(img)
 
-    with tf.Session() as sess:
+    with tf.compat.v1.Session() as sess:
         for i in range(n_frames):
             x = sess.run(op)
             images.append(x)

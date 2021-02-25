@@ -9,7 +9,7 @@ from keras_applications import vgg16, vgg19, resnet, resnet50, resnext, resnet_v
 
 
 def get_ws_vars(ws_ckpt_fn: str) -> List[str]:
-    reader = tf.train.NewCheckpointReader(ws_ckpt_fn)
+    reader = tf.compat.v1.train.NewCheckpointReader(ws_ckpt_fn)
     var_to_shape_map = reader.get_variable_to_shape_map()
     ws_vars = list(var_to_shape_map.keys())
 
@@ -22,7 +22,7 @@ def get_ws_vars(ws_ckpt_fn: str) -> List[str]:
 
 def keras_ckpt(model, model_dir: str):
     # Here we use the simplest SGD optimizer to avoid creating new variables
-    model.compile(tf.train.GradientDescentOptimizer(0.1), 'categorical_crossentropy')
+    model.compile(tf.compat.v1.train.GradientDescentOptimizer(0.1), 'categorical_crossentropy')
     tf.keras.estimator.model_to_estimator(keras_model=model, model_dir=model_dir)
 
 

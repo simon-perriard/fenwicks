@@ -71,7 +71,7 @@ def random_rotate_90(x: tf.Tensor) -> tf.Tensor:
     :param x: Input image.
     :return: Transformed image.
     """
-    return tf.image.rot90(x, tf.random_uniform(shape=[], minval=0, maxval=4, dtype=tf.int32))
+    return tf.image.rot90(x, tf.compat.v1.random_uniform(shape=[], minval=0, maxval=4, dtype=tf.int32))
 
 
 def apply_affine_mat(x: tf.Tensor, mat: tf.Tensor, do_reflect: bool = False) -> tf.Tensor:
@@ -93,7 +93,7 @@ def apply_affine_mats(x: tf.Tensor, mats: List[tf.Tensor], ps: List[float]) -> t
 
 
 def random_rotate_matrix(max_deg: float = 10) -> tf.Tensor:
-    deg = tf.random_uniform(shape=[], minval=-max_deg, maxval=max_deg, dtype=tf.float32)
+    deg = tf.compat.v1.random_uniform(shape=[], minval=-max_deg, maxval=max_deg, dtype=tf.float32)
     rad = core.deg2rad(deg)
     return tf.convert_to_tensor([[tf.cos(rad), -tf.sin(rad), 0], [tf.sin(rad), tf.cos(rad), 0], [0, 0, 1]])
 
@@ -104,7 +104,7 @@ def random_rotate(x: tf.Tensor, max_rot_deg: float = 10) -> tf.Tensor:
 
 
 def random_zoom_matrix(max_zoom: float = 1.1, row_pct: float = 0.5, col_pct: float = 0.5) -> tf.Tensor:
-    scale = tf.random_uniform(shape=[], minval=1.0, maxval=max_zoom, dtype=tf.float32)
+    scale = tf.compat.v1.random_uniform(shape=[], minval=1.0, maxval=max_zoom, dtype=tf.float32)
     s = 1 - 1 / scale
     col_c = s * (2 * col_pct - 1)
     row_c = s * (2 * row_pct - 1)
@@ -117,7 +117,7 @@ def random_zoom(x: tf.Tensor, max_zoom: float = 1.1, row_pct: float = 0.5, col_p
 
 
 def random_shear_matrix(max_shear_deg: float = 10) -> tf.Tensor:
-    deg = tf.random_uniform(shape=[], minval=-max_shear_deg, maxval=max_shear_deg, dtype=tf.float32)
+    deg = tf.compat.v1.random_uniform(shape=[], minval=-max_shear_deg, maxval=max_shear_deg, dtype=tf.float32)
     rad = core.deg2rad(deg)
     return tf.convert_to_tensor([[1, -tf.sin(rad), 0], [0, tf.cos(rad), 0], [0, 0, 1]])
 
@@ -128,8 +128,8 @@ def random_shear(x: tf.Tensor, max_shear_deg: float = 10) -> tf.Tensor:
 
 
 def random_shift_matrix(wrg: float = 0.1, hrg: float = 0.1) -> tf.Tensor:
-    tx = tf.random_uniform(shape=[], minval=-hrg, maxval=hrg, dtype=tf.float32)
-    ty = tf.random_uniform(shape=[], minval=-wrg, maxval=wrg, dtype=tf.float32)
+    tx = tf.compat.v1.random_uniform(shape=[], minval=-hrg, maxval=hrg, dtype=tf.float32)
+    ty = tf.compat.v1.random_uniform(shape=[], minval=-wrg, maxval=wrg, dtype=tf.float32)
     return tf.convert_to_tensor([[1, 0, tx], [0, 1, ty], [0, 0, 1]])
 
 
@@ -139,7 +139,7 @@ def random_shift(x: tf.Tensor, wrg: float = 0.1, hrg: float = 0.1) -> tf.Tensor:
 
 
 def random_dihedral_matrix() -> tf.Tensor:
-    k = tf.random_uniform(shape=[], minval=0, maxval=8, dtype=tf.int32)
+    k = tf.compat.v1.random_uniform(shape=[], minval=0, maxval=8, dtype=tf.int32)
     x = tf.bitwise.bitwise_and(k, 1) * -2 + 1
     y = tf.bitwise.bitwise_and(k, 2) * -2 + 1
     return tf.cond(tf.bitwise.bitwise_and(k, 4) > 0, lambda: tf.convert_to_tensor([[0, x, 0.], [y, 0, 0], [0, 0, 1.]]),
@@ -238,7 +238,7 @@ def random_pad_crop(x: tf.Tensor, pad_size: int) -> tf.Tensor:
     """
     shape = tf.shape(x)
     x = tf.pad(x, [[pad_size, pad_size], [pad_size, pad_size], [0, 0]], mode='reflect')
-    x = tf.random_crop(x, [shape[0], shape[1], 3])
+    x = tf.compat.v1.random_crop(x, [shape[0], shape[1], 3])
     return x
 
 
@@ -317,7 +317,7 @@ def tfm_set_shape(h: int = None, w: int = None, c: int = 3) -> Callable:
 
 
 def tfm_resize(h: int, w: int) -> Callable:
-    return functools.partial(tf.image.resize_images, size=[h, w])
+    return functools.partial(tf.compat.v1.image.resize_images, size=[h, w])
 
 
 def tfm_random_flip(flip_vert: bool = False) -> Callable:

@@ -23,12 +23,12 @@ def parallel_transforms(x: tf.Tensor, trms: List[Callable]) -> List[tf.Tensor]:
 
 
 def random_matmul(mat1: tf.Tensor, mat2: tf.Tensor, p: float) -> tf.Tensor:
-    choice = tf.random_uniform(shape=[], minval=0., maxval=1., dtype=tf.float32)
+    choice = tf.compat.v1.random_uniform(shape=[], minval=0., maxval=1., dtype=tf.float32)
     return tf.cond(choice < p, lambda: tf.matmul(mat1, mat2), lambda: mat1)
 
 
 def random_transform(x: tf.Tensor, tfm: Callable, p: float) -> tf.Tensor:
-    choice = tf.random_uniform(shape=[], minval=0., maxval=1., dtype=tf.float32)
+    choice = tf.compat.v1.random_uniform(shape=[], minval=0., maxval=1., dtype=tf.float32)
     return tf.cond(choice < p, lambda: tfm(x), lambda: x)
 
 
@@ -112,4 +112,4 @@ def convert_by_dict(d: Dict, items: List) -> List:
 
 
 def get_node_names() -> List[str]:
-    return [n.name for n in tf.get_default_graph().as_graph_def().node]
+    return [n.name for n in tf.compat.v1.get_default_graph().as_graph_def().node]

@@ -11,7 +11,7 @@ from collections import Counter
 
 
 def configure_plotly_browser_state():
-    display(IPython.core.display.HTML('''
+    display(data=IPython.display.HTML('''
     <script src="/static/components/requirejs/require.js"></script>
     <script>
       requirejs.config({
@@ -19,7 +19,7 @@ def configure_plotly_browser_state():
           base: '/static/base',
           plotly: 'https://cdn.plot.ly/plotly-1.47.1.min.js?noext',
         },
-      });
+      });s
     </script>
     '''))
 
@@ -32,11 +32,11 @@ def setup():
 
 def simulate_lr_func(lr_func: Callable, total_steps: int) -> np.array:
     lr_values = np.zeros(total_steps)
-    step = tf.placeholder(tf.int64)
+    step = tf.compat.v1.placeholder(tf.int64)
     lr = lr_func(step=step)
 
-    with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
+    with tf.compat.v1.Session() as sess:
+        sess.run(tf.compat.v1.global_variables_initializer())
         for i in range(total_steps):
             lr_values[i] = sess.run(lr, feed_dict={step: i})
 
@@ -48,7 +48,7 @@ def plot_scatter(ys, h: int = 350, w: int = 350, ytitle: str = '', xtitle: str =
     layout = go.Layout(autosize=False, width=w, height=h, yaxis=go.layout.YAxis(title=ytitle),
                        xaxis=go.layout.XAxis(title=xtitle), margin=go.layout.Margin(l=80, r=20, b=40, t=20))
     fig = go.Figure(data=data, layout=layout)
-    plotly.offline.iplot(fig)
+    plotly.iplot(fig)
 
 
 def plot_lr_func(lr_func: Callable, total_steps: int):
@@ -129,7 +129,7 @@ def plot_heatmap(xs, ys, zs, h: int = 350, w: int = 550, xtitle: str = None, yti
 
     data = [go.Heatmap(**trace)]
     fig = go.Figure(data=data, layout=layout)
-    plotly.offline.iplot(fig)
+    plotly.iplot(fig)
 
 
 def plot_confusion_mat(xs, ys, zs, h: int = 350, w: int = 550):
