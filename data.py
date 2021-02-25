@@ -55,7 +55,7 @@ def numpy_tfrecord(output_fn: str, X, y=None, overwrite: bool = False):
                 example = numpy_tfexample(X_reshape[i]) if y is None else numpy_tfexample(X_reshape[i], y[i])
                 record_writer.write(example.SerializeToString())
     else:
-        tf.logging.info('Output file already exists. Skipping.')
+        tf.compat.v1.logging.info('Output file already exists. Skipping.')
 
 
 # todo: number of threads.
